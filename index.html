@@ -68,7 +68,7 @@
     .version-badge {
       background-color: #42b983;
       color: white;
-      padding: 6px 10px;
+      padding: 4px 10px;
       border-radius: 6px;
       font-size: 0.8rem;
       font-weight: bold;
@@ -239,6 +239,34 @@
       box-shadow: 0 2px 8px rgba(66, 185, 131, 0.3);
     }
     
+    /* 修改按钮样式 */
+    .el-button--default {
+      border-color: #909399;
+      color: #606266;
+      background: #f4f4f5;
+    }
+    
+    .el-button--default:hover, 
+    .el-button--default:focus {
+      background: #f9f9fa;
+      border-color: #409EFF;
+      color: #409EFF;
+      box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
+    }
+    
+    /* 全屏按钮特殊样式 */
+    .preview-header .el-button--default {
+      background: #ecf5ff;
+      border-color: #b3d8ff;
+      color: #409EFF;
+    }
+    
+    .preview-header .el-button--default:hover {
+      background: #409EFF;
+      border-color: #409EFF;
+      color: white;
+    }
+    
     /* 错误提示 */
     .error-message {
       color: #e74c3c;
@@ -266,6 +294,42 @@
         border-right: none;
         border-bottom: 1px solid #c0c4cc;
       }
+    }
+    
+    /* 添加全屏样式 */
+    .preview-container.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+      background: white;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .preview-container.fullscreen .preview-wrapper {
+      height: calc(100vh - 80px);
+    }
+    
+    /* Element UI 标识样式加深 */
+    .element-ui-tag {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 10px;
+      padding: 4px 8px;
+      background: #95d475;
+      border: 1px solid #95d475;
+      border-radius: 4px;
+      color: white;
+      font-size: 12px;
+      box-shadow: 0 2px 4px rgba(103, 194, 58, 0.2);
+    }
+    
+    .element-ui-tag i {
+      margin-right: 4px;
+      font-size: 14px;
     }
   </style>
 </head>
@@ -298,7 +362,15 @@
       <div class="preview-container">
         <div class="preview-header">
           <h2><i class="fas fa-play-circle"></i> 预览</h2>
-          <el-button size="small" @click="refreshPreview" icon="el-icon-refresh">刷新</el-button>
+          <div style="display: flex; align-items: center;">
+            <span class="element-ui-tag">
+              <i class="el-icon-platform-eleme"></i>
+              Element UI
+            </span>
+            <el-button size="small" @click="toggleFullscreen" icon="el-icon-full-screen">
+              {{ isFullscreen ? '退出全屏' : '全屏' }}
+            </el-button>
+          </div>
         </div>
         <div class="preview-wrapper">
           <!-- 使用v-html渲染预览内容 -->
@@ -383,7 +455,8 @@ button:hover {
         error: null,
         previewVM: null,
         previewHtml: '', // 用于v-html渲染的HTML字符串
-        tempFilename: 'temp-component.vue'
+        tempFilename: 'temp-component.vue',
+        isFullscreen: false  // 添加全屏状态
       },
       mounted() {
         // 初始化编辑器
@@ -391,6 +464,13 @@ button:hover {
         
         // 初始化预览
         this.updatePreview();
+
+        // 添加 ESC 键监听
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && this.isFullscreen) {
+            this.toggleFullscreen();
+          }
+        });
       },
       methods: {
         // 初始化代码编辑器
@@ -505,7 +585,22 @@ button:hover {
         resetEditor() {
           this.editor.setValue(examples.hello);
           this.updatePreview();
+        },
+        
+        // 切换全屏方法
+        toggleFullscreen() {
+          this.isFullscreen = !this.isFullscreen;
+          const previewContainer = document.querySelector('.preview-container');
+          
+          if (this.isFullscreen) {
+            previewContainer.classList.add('fullscreen');
+          } else {
+            previewContainer.classList.remove('fullscreen');
+          }
         }
+      },
+      beforeDestroy() {
+        document.removeEventListener('keydown', this.handleEscKey);
       }
     });
   </script>
