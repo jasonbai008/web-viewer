@@ -9,9 +9,33 @@
   
   <!-- 引入 CodeMirror 编辑器 - 使用 jsdelivr CDN -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/dracula.min.css">
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/vue/vue.min.js"></script>
+  
+  <!-- 添加 CodeMirror 相关模式和插件 -->
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/css/css.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/xml/xml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/vue/vue.js"></script>
+  
+  <!-- 添加格式化插件 -->
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/edit/closetag.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/foldcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/foldgutter.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/brace-fold.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/xml-fold.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/comment-fold.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/foldgutter.min.css">
+  
+  <!-- 添加格式化库 -->
+  <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/standalone.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/parser-html.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/parser-postcss.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/parser-babel.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/parser-typescript.js"></script>
   
   <!-- 引入字体图标 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
@@ -351,7 +375,8 @@
         <div class="editor-header">
           <h2><i class="fas fa-code"></i> 编辑器</h2>
           <div class="editor-actions">
-            <!-- 添加图标到按钮 -->
+            <!-- 添加格式化按钮 -->
+            <el-button size="small" @click="formatCode" icon="el-icon-magic-stick">格式化</el-button>
             <el-button type="primary" size="small" @click="updatePreview" icon="el-icon-video-play">运行</el-button>
             <el-button size="small" @click="resetEditor" icon="el-icon-refresh">重置</el-button>
           </div>
@@ -476,16 +501,70 @@ button:hover {
       methods: {
         // 初始化代码编辑器
         initEditor() {
+          // 配置更强大的编辑器
           this.editor = CodeMirror(this.$refs.editorContainer, {
             value: this.componentCode,
-            mode: 'vue',
-            theme: 'monokai',
+            mode: 'text/x-vue',
+            mode: 'htmlmixed',
+            theme: 'dracula',
             lineNumbers: true,
             lineWrapping: true,
             tabSize: 2,
+            indentUnit: 2,
+            smartIndent: true,
+            indentWithTabs: false,
             autoCloseBrackets: true,
-            matchBrackets: true
+            matchBrackets: true,
+            autoCloseTags: true,
+            foldGutter: true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+            extraKeys: {
+              "Ctrl-Q": function(cm) { cm.foldCode(cm.getCursor()); },
+              "Ctrl-F": "findPersistent",
+              // 添加格式化快捷键
+              "Ctrl-Alt-F": this.formatCode
+            }
           });
+        },
+        
+        // 格式化代码
+        formatCode() {
+          try {
+            // 获取当前代码
+            const code = this.editor.getValue();
+            
+            // 使用 Prettier 格式化代码
+            const formattedCode = prettier.format(code, {
+              parser: "vue",
+              plugins: [prettierPlugins.html, prettierPlugins.babel, prettierPlugins.postcss, prettierPlugins.typescript],
+              printWidth: 80,
+              tabWidth: 2,
+              useTabs: false,
+              semi: true,
+              singleQuote: true,
+              trailingComma: "es5",
+              bracketSpacing: true,
+              arrowParens: "avoid",
+              htmlWhitespaceSensitivity: "css"
+            });
+            
+            // 更新编辑器内容
+            this.editor.setValue(formattedCode);
+            
+            // 显示成功消息
+            this.$message({
+              message: '代码格式化成功',
+              type: 'success',
+              duration: 2000
+            });
+          } catch (err) {
+            // 显示错误消息
+            this.$message({
+              message: `格式化失败: ${err.message}`,
+              type: 'error',
+              duration: 3000
+            });
+          }
         },
         
         // 更新预览

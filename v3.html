@@ -9,16 +9,22 @@
     <link rel="stylesheet" href="https://unpkg.com/element-plus@2.3.14/dist/index.css">
 
     <!-- 引入 Vue 3 -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
     <!-- 引入 Element Plus -->
     <script src="https://unpkg.com/element-plus@2.3.14/dist/index.full.min.js"></script>
 
     <!-- 引入 CodeMirror 编辑器 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/dracula.min.css">
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/vue/vue.min.js"></script>
+
+    <!-- 添加 CodeMirror 语法高亮支持 -->
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/css/css.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/xml/xml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/vue/vue.js"></script>
 
     <!-- 引入字体图标 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
@@ -325,12 +331,6 @@
 </head>
 
 <body>
-    <!-- 先加载 Vue -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-
-    <!-- 再加载 Element Plus -->
-    <script src="https://unpkg.com/element-plus@2.3.14/dist/index.full.min.js"></script>
-
     <!-- 最后加载 vue3-sfc-loader -->
     <script src="https://unpkg.com/vue3-sfc-loader@0.8.4/dist/vue3-sfc-loader.js"></script>
 
@@ -354,9 +354,6 @@
                         <div class="editor-actions">
                             <el-button type="primary" @click="updatePreview">
                                 <i class="fas fa-play"></i> 运行
-                            </el-button>
-                            <el-button @click="resetEditor">
-                                <i class="fas fa-redo"></i> 重置
                             </el-button>
                         </div>
                     </div>
@@ -439,8 +436,9 @@ exports.changeMessage = changeMessage;
                 const initEditor = () => {
                     editor.value = CodeMirror(editorContainer.value, {
                         value: examples.hello,
-                        mode: 'vue',
-                        theme: 'monokai',
+                        mode: 'text/x-vue',
+                        mode: 'htmlmixed',
+                        theme: 'dracula',
                         lineNumbers: true,
                         lineWrapping: true,
                         tabSize: 2,
@@ -466,8 +464,10 @@ exports.changeMessage = changeMessage;
                         error.value = null;
                         const code = editor.value.getValue();
 
-                        // 清理旧实例
+                        // 创建一个新的容器元素
+                        const container = document.createElement('div');
                         previewContainer.value.innerHTML = '';
+                        previewContainer.value.appendChild(container);
 
                         // 修改加载器配置部分
                         const options = {
@@ -504,18 +504,12 @@ exports.changeMessage = changeMessage;
                             // size: 'small',
                             zIndex: 3000
                         });
-                        app.mount(previewContainer.value);
+                        app.mount(container);
 
                     } catch (err) {
                         error.value = `编译错误: ${err.message.replace(/at.*/g, '')}`;
                         console.error('完整错误堆栈:', err);
                     }
-                };
-
-                // 重置编辑器
-                const resetEditor = () => {
-                    editor.value.setValue(examples.hello);
-                    updatePreview();
                 };
 
                 // 切换全屏
@@ -546,7 +540,6 @@ exports.changeMessage = changeMessage;
                     error,
                     isFullscreen,
                     updatePreview,
-                    resetEditor,
                     toggleFullscreen
                 };
             }
