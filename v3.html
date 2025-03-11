@@ -259,6 +259,22 @@
 
         /* 响应式调整 */
         @media (max-width: 768px) {
+            /* 调整头部标题字号 */
+            .header h1 {
+                font-size: 1.2rem;
+            }
+
+            .header h1 i {
+                font-size: 1.4rem;
+            }
+
+            /* 调整版本号字号和间距 */
+            .version-badge {
+                font-size: 0.7rem;
+                padding: 3px 8px;
+            }
+
+            /* 调整布局结构 */
             .main-container {
                 flex-direction: column;
             }
@@ -267,12 +283,88 @@
             .preview-container {
                 width: 100%;
                 height: 50vh;
+                padding: 0;
             }
 
-            .editor-container {
-                border-right: none;
-                border-bottom: 1px solid #c0c4cc;
+            /* 调整编辑器和预览区域标题字号 */
+            .editor-header h2,
+            .preview-header h2 {
+                font-size: 1rem;
             }
+
+            /* 调整按钮间距和大小 */
+            .editor-actions {
+                gap: 5px;
+            }
+
+            .el-button {
+                height: 28px;
+                padding: 0 10px;
+                font-size: 12px;
+            }
+
+            .el-button .fas {
+                font-size: 12px;
+                margin-right: 4px;
+            }
+
+            /* 调整编辑器字号 */
+            .CodeMirror {
+                font-size: 12px;
+            }
+
+            /* 调整预览区域内边距 */
+            .preview-wrapper {
+                padding: 10px;
+            }
+
+            /* Element Plus 标识适配 */
+            .element-plus-tag {
+                display: none;
+            }
+        }
+
+        /* 小屏幕断点调整 */
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 10px;
+                height: 50px;
+            }
+
+            .header h1 {
+                font-size: 1rem;
+            }
+
+            .version-info {
+                gap: 8px;
+            }
+
+            /* 优化按钮在小屏幕上的显示 */
+            .el-button {
+                padding: 0 8px;
+                white-space: nowrap;
+            }
+
+            .el-button .fas {
+                margin-right: 3px;
+            }
+
+            /* 调整 Element Plus 标签在小屏幕上的显示 */
+            .element-plus-tag {
+                display: none;
+            }
+
+            /* 调整编辑器和预览头部高度 */
+            .editor-header,
+            .preview-header {
+                height: 40px;
+            }
+        }
+
+        /* 全屏模式下的预览容器调整 */
+        .preview-container.fullscreen .preview-wrapper {
+            height: calc(100vh - 50px);
+            padding: 15px;
         }
 
         /* 添加全屏样式 */

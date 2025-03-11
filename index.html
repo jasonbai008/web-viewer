@@ -306,18 +306,96 @@
     
     /* 响应式调整 */
     @media (max-width: 768px) {
+      /* 调整头部标题字号 */
+      .header h1 {
+        font-size: 1.2rem;
+      }
+
+      .header h1 i {
+        font-size: 1.4rem;
+      }
+
+      /* 调整版本号字号和间距 */
+      .version-badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+      }
+
+      .version-info a {
+        font-size: 16px !important;
+      }
+
+      /* 调整布局结构 */
       .main-container {
         flex-direction: column;
       }
       
-      .editor-container, .preview-container {
+      .editor-container, 
+      .preview-container {
         width: 100%;
         height: 50vh;
+        padding: 10px;
       }
       
       .editor-container {
         border-right: none;
         border-bottom: 1px solid #c0c4cc;
+      }
+
+      /* 调整编辑器和预览区域标题字号 */
+      .editor-header h2,
+      .preview-header h2 {
+        font-size: 1rem;
+      }
+
+      /* 调整按钮间距和大小 */
+      .editor-actions {
+        gap: 5px;
+      }
+
+      .el-button {
+        padding: 7px 12px;
+      }
+
+      /* 调整编辑器字号 */
+      .CodeMirror {
+        font-size: 12px;
+      }
+
+      /* 调整预览区域内边距 */
+      .preview-wrapper {
+        padding: 10px;
+      }
+
+      /* Element UI 标识适配 */
+      .element-ui-tag {
+        padding: 2px 6px;
+        font-size: 10px;
+      }
+    }
+    
+    /* 添加小屏幕断点 */
+    @media (max-width: 480px) {
+      .header {
+        padding: 10px;
+        height: 56px;
+      }
+
+      .header h1 {
+        font-size: 1rem;
+      }
+
+      .version-info {
+        gap: 8px;
+      }
+
+      /* 在特小屏幕上隐藏按钮文字，只显示图标 */
+      .el-button [class^="el-icon-"] {
+        margin-right: 0;
+      }
+
+      .el-button span:not([class^="el-icon-"]) {
+        display: none;
       }
     }
     
