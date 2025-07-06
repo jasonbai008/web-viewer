@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+    <title>HTML Live Preview</title>
+    <!-- 引入 Element UI -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+
+    <!-- 引入 CodeMirror 编辑器 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/dracula.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.js"></script>
+
+    <!-- 添加 CodeMirror 相关模式和插件 -->
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/css/css.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/xml/xml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js"></script>
+
+    <!-- 添加格式化插件 -->
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/edit/closetag.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/brace-fold.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/xml-fold.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/comment-fold.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/foldgutter.min.css" />
+
+    <!-- 添加格式化库 -->
+    <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/standalone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/parser-html.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/parser-postcss.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/parser-babel.js"></script>
+
+    <!-- 引入 Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+    <!-- 引入 Element UI -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f5f5;
+        overflow: hidden;
+      }
+
+      .container {
+        display: flex;
+        height: 100vh;
+      }
+
+      /* 编辑器区域 */
+      .editor-container {
+        flex: 1;
+        background: white;
+        border-right: 1px solid #e6e6e6;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .editor-header {
+        padding: 15px 20px;
+        background: #fafafa;
+        border-bottom: 1px solid #e6e6e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .editor-header h2 {
+        font-size: 1.2rem;
+        color: #2c3e50;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+      }
+
+      .editor-header i {
+        margin-right: 8px;
+        color: #409eff;
+      }
+
+      .editor-wrapper {
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .editor-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .CodeMirror {
+        height: 100%;
+        font-family: "Fira Code", Consolas, Monaco, "Andale Mono", monospace;
+        font-size: 14px;
+      }
+
+      .CodeMirror-scroll {
+        overflow-y: auto;
+        overflow-x: auto;
+      }
+
+      .CodeMirror-vscrollbar::-webkit-scrollbar,
+      .CodeMirror-hscrollbar::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      .CodeMirror-vscrollbar::-webkit-scrollbar-track,
+      .CodeMirror-hscrollbar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+      }
+
+      .CodeMirror-vscrollbar::-webkit-scrollbar-thumb,
+      .CodeMirror-hscrollbar::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
+
+      .CodeMirror-vscrollbar::-webkit-scrollbar-thumb:hover,
+      .CodeMirror-hscrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      /* 预览区域 */
+      .preview-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .preview-header {
+        padding: 15px 20px;
+        background: #fafafa;
+        border-bottom: 1px solid #e6e6e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .preview-header h2 {
+        font-size: 1.2rem;
+        color: #2c3e50;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+      }
+
+      .preview-header i {
+        margin-right: 8px;
+        color: #67c23a;
+      }
+
+      .preview-wrapper {
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .preview-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: white;
+      }
+
+      .live-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: #67c23a;
+      }
+
+      .live-dot {
+        width: 8px;
+        height: 8px;
+        background: #67c23a;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 9999;
+        background: white;
+      }
+
+      .fullscreen .preview-wrapper {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="container">
+        <!-- 编辑器区域 -->
+        <div class="editor-container">
+          <div class="editor-header">
+            <h2><i class="el-icon-edit"></i> HTML 代码编辑器</h2>
+            <div class="editor-actions">
+              <el-button size="small" @click="formatCode" icon="el-icon-magic-stick">格式化</el-button>
+              <el-button size="small" @click="resetEditor" icon="el-icon-refresh">重置</el-button>
+            </div>
+          </div>
+          <div class="editor-wrapper" ref="editorContainer"></div>
+        </div>
+
+        <!-- 预览区域 -->
+        <div class="preview-container" :class="{ fullscreen: isFullscreen }">
+          <div class="preview-header">
+            <h2><i class="el-icon-view"></i> 实时预览</h2>
+            <div style="display: flex; align-items: center; gap: 15px">
+              <div class="live-indicator">
+                <div class="live-dot"></div>
+                <span>实时预览</span>
+              </div>
+              <el-button size="small" @click="toggleFullscreen" icon="el-icon-full-screen"> {{ isFullscreen ? '退出全屏' : '全屏预览' }} </el-button>
+            </div>
+          </div>
+          <div class="preview-wrapper">
+            <iframe ref="previewFrame" class="preview-iframe" :srcdoc="previewContent" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      new Vue({
+        el: "#app",
+        data() {
+          return {
+            editor: null,
+            previewContent: "",
+            isFullscreen: false,
+            defaultHtml: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML 预览</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    p {
+      line-height: 1.6;
+      color: #666;
+    }
+    .highlight {
+      background: #ffeb3b;
+      padding: 2px 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>欢迎使用 HTML 实时预览</h1>
+    <p>在左侧编辑器中编写 HTML 代码，右侧会实时显示预览效果。</p>
+    <p>您可以编写完整的 HTML 文档，也可以只编写 HTML 片段。</p>
+    <p>支持的特性：</p>
+    <ul>
+      <li>✅ 完整的 HTML 文档</li>
+      <li>✅ HTML 片段</li>
+      <li>✅ 内联 CSS 样式</li>
+      <li>✅ JavaScript 代码</li>
+      <li>✅ 实时预览</li>
+      <li>✅ 代码格式化</li>
+    </ul>
+    <p>试试在左侧编辑器中修改这些内容，右侧会<span class="highlight">实时更新</span>！</p>
+  </div>
+</body>
+</html>`,
+          };
+        },
+        mounted() {
+          this.initEditor();
+          this.updatePreview();
+
+          // 监听 ESC 键退出全屏
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && this.isFullscreen) {
+              this.toggleFullscreen();
+            }
+          });
+        },
+        methods: {
+          // 初始化代码编辑器
+          initEditor() {
+            this.editor = CodeMirror(this.$refs.editorContainer, {
+              value: this.defaultHtml,
+              mode: "htmlmixed",
+              theme: "dracula",
+              lineNumbers: true,
+              lineWrapping: true,
+              tabSize: 2,
+              indentUnit: 2,
+              smartIndent: true,
+              indentWithTabs: false,
+              autoCloseBrackets: true,
+              matchBrackets: true,
+              autoCloseTags: true,
+              foldGutter: true,
+              gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+              extraKeys: {
+                "Ctrl-Q": function (cm) {
+                  cm.foldCode(cm.getCursor());
+                },
+                "Ctrl-F": "findPersistent",
+                "Ctrl-Alt-F": () => this.formatCode(),
+              },
+            });
+
+            // 监听编辑器内容变化，实现实时预览
+            this.editor.on("change", () => {
+              this.updatePreview();
+            });
+          },
+
+          // 更新预览内容
+          updatePreview() {
+            const code = this.editor.getValue();
+
+            // 检查是否是完整的 HTML 文档
+            if (code.trim().toLowerCase().startsWith("<!doctype") || code.trim().toLowerCase().startsWith("<html")) {
+              // 完整的 HTML 文档
+              this.previewContent = code;
+            } else {
+              // HTML 片段，包装成完整文档
+              this.previewContent = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML 预览</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+${code}
+</body>
+</html>`;
+            }
+          },
+
+          // 格式化代码
+          formatCode() {
+            try {
+              const code = this.editor.getValue();
+              const formatted = prettier.format(code, {
+                parser: "html",
+                plugins: prettierPlugins,
+                tabWidth: 2,
+                semi: true,
+                singleQuote: false,
+                printWidth: 80,
+                htmlWhitespaceSensitivity: "css",
+              });
+              this.editor.setValue(formatted);
+              this.$message.success("代码格式化成功！");
+            } catch (error) {
+              this.$message.error("代码格式化失败，请检查语法！");
+            }
+          },
+
+          // 重置编辑器
+          resetEditor() {
+            this.$confirm("确定要重置编辑器内容吗？", "提示", {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            })
+              .then(() => {
+                this.editor.setValue(this.defaultHtml);
+                this.$message.success("编辑器已重置！");
+              })
+              .catch(() => {});
+          },
+
+          // 切换全屏预览
+          toggleFullscreen() {
+            this.isFullscreen = !this.isFullscreen;
+            if (this.isFullscreen) {
+              this.$message.info("按 ESC 键退出全屏");
+            }
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

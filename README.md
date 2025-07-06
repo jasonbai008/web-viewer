@@ -1,6 +1,10 @@
 # vue-preview
 
-一个强大的 Vue 组件预览工具，支持预览 Vue2 和 Vue3 单文件组件(SFC)。
+一个强大的 Web 预览工具，支持预览 Vue2 和 Vue3 单文件组件(SFC)、Html。
+
+## Html 预览原理
+
+本工具采用 `iframe` 预览，将用户代码通过 `iframe` 加载到浏览器中，并监听 `iframe` 的 `load` 事件，获取 `iframe` 内的 DOM 结构。
 
 ## 预览原理（Vue2）
 

@@ -1,768 +1,329 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
-  <title>Vue SFC Playground</title>
-  <!-- 引入 Element UI -->
-  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-  
-  <!-- 引入 CodeMirror 编辑器 - 使用 jsdelivr CDN -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/dracula.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.js"></script>
-  
-  <!-- 添加 CodeMirror 相关模式和插件 -->
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/javascript/javascript.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/css/css.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/xml/xml.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/vue/vue.js"></script>
-  
-  <!-- 添加格式化插件 -->
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/edit/matchbrackets.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/edit/closebrackets.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/edit/closetag.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/foldcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/foldgutter.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/brace-fold.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/xml-fold.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/comment-fold.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/addon/fold/foldgutter.min.css">
-  
-  <!-- 添加格式化库 -->
-  <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/standalone.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/parser-html.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/parser-postcss.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/parser-babel.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prettier@2.8.8/parser-typescript.js"></script>
-  
-  <!-- 引入字体图标 -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
-  
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      line-height: 1.5;
-      color: #2c3e50;
-      background-color: #f8f9fa;
-    }
-    
-    /* 头部样式 */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 20px;
-      background: linear-gradient(135deg, #34495e 0%, #3498db 100%);
-      color: white;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-      position: relative;
-      z-index: 10;
-      height: 64px;
-    }
-    
-    .header h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-    }
-    
-    .header h1 i {
-      margin-right: 10px;
-      font-size: 1.8rem;
-      color: #42b983;
-    }
-    
-    /* 版本标签样式 */
-    .version-badge {
-      background-color: #42b983;
-      color: white;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      box-shadow: 0 2px 4px rgba(66, 185, 131, 0.3);
-      display: flex;
-      align-items: center;
-    }
-    
-    .version-badge i {
-      margin-right: 5px;
-    }
-    
-    /* 主体内容样式 */
-    .main-container {
-      display: flex;
-      height: calc(100vh - 64px);
-      background-color: #fff;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-      border: 1px solid #c0c4cc;
-      overflow: hidden;
-    }
-    
-    /* 编辑器区域 */
-    .editor-container {
-      flex: 1;
-      padding: 20px;
-      border-right: 1px solid #c0c4cc;
-      display: flex;
-      flex-direction: column;
-      background-color: #fafafa;
-      overflow: hidden;
-    }
-    
-    .editor-header {
-      margin-bottom: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .editor-header h2 {
-      font-size: 1.2rem;
-      color: #2c3e50;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-    }
-    
-    .editor-header h2 i {
-      margin-right: 8px;
-      color: #3498db;
-    }
-    
-    .editor-actions {
-      display: flex;
-      gap: 10px;
-    }
-    
-    .editor-wrapper {
-      flex: 1;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-      border: 1px solid #c0c4cc;
-    }
-    
-    /* 自定义滚动条样式 */
-    .CodeMirror-vscrollbar::-webkit-scrollbar,
-    .CodeMirror-hscrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    
-    .CodeMirror-vscrollbar::-webkit-scrollbar-track,
-    .CodeMirror-hscrollbar::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.05);
-    }
-    
-    .CodeMirror-vscrollbar::-webkit-scrollbar-thumb,
-    .CodeMirror-hscrollbar::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 3px;
-    }
-    
-    .CodeMirror-vscrollbar::-webkit-scrollbar-thumb:hover,
-    .CodeMirror-hscrollbar::-webkit-scrollbar-thumb:hover {
-      background: rgba(0, 0, 0, 0.3);
-    }
-    
-    .CodeMirror {
-      height: 100%;
-      font-family: "Fira Code", Consolas, Monaco, "Andale Mono", monospace;
-      font-size: 14px;
-    }
-    
-    /* 预览区域 */
-    .preview-container {
-      flex: 1;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    
-    .preview-header {
-      margin-bottom: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .preview-header h2 {
-      font-size: 1.2rem;
-      color: #2c3e50;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-    }
-    
-    .preview-header h2 i {
-      margin-right: 8px;
-      color: #e74c3c;
-    }
-    
-    .preview-wrapper {
-      flex: 1;
-      border-radius: 4px;
-      padding: 20px;
-      overflow: auto;
-      background-color: #fff;
-      border: 1px solid #c0c4cc;
-    }
-    
-    /* 自定义预览区域滚动条 */
-    .preview-wrapper::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    
-    .preview-wrapper::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.05);
-    }
-    
-    .preview-wrapper::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 3px;
-    }
-    
-    .preview-wrapper::-webkit-scrollbar-thumb:hover {
-      background: rgba(0, 0, 0, 0.3);
-    }
-    
-    /* 按钮样式美化 */
-    .el-button {
-      border-radius: 6px;
-      font-weight: 500;
-      transition: all 0.3s;
-    }
-    
-    .el-button--primary {
-      background: linear-gradient(135deg, #42b983 0%, #3eaf7c 100%);
-      border-color: #42b983;
-    }
-    
-    .el-button--primary:hover, .el-button--primary:focus {
-      background: linear-gradient(135deg, #3eaf7c 0%, #369e6a 100%);
-      border-color: #3eaf7c;
-      box-shadow: 0 2px 8px rgba(66, 185, 131, 0.3);
-    }
-    
-    /* 修改按钮样式 */
-    .el-button--default {
-      border-color: #909399;
-      color: #606266;
-      background: #f4f4f5;
-    }
-    
-    .el-button--default:hover, 
-    .el-button--default:focus {
-      background: #f9f9fa;
-      border-color: #409EFF;
-      color: #409EFF;
-      box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
-    }
-    
-    /* 全屏按钮特殊样式 */
-    .preview-header .el-button--default {
-      background: #ecf5ff;
-      border-color: #b3d8ff;
-      color: #409EFF;
-    }
-    
-    .preview-header .el-button--default:hover {
-      background: #409EFF;
-      border-color: #409EFF;
-      color: white;
-    }
-    
-    /* 错误提示 */
-    .error-message {
-      color: #e74c3c;
-      margin-top: 15px;
-      padding: 12px;
-      background-color: #fef0f0;
-      border-radius: 6px;
-      border: 1px solid #f5c6cb;
-      border-left: 4px solid #e74c3c;
-      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.1);
-    }
-    
-    /* 响应式调整 */
-    @media (max-width: 768px) {
-      /* 调整头部标题字号 */
-      .header h1 {
-        font-size: 1.2rem;
-      }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      .header h1 i {
-        font-size: 1.4rem;
-      }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
 
-      /* 调整版本号字号和间距 */
-      .version-badge {
-        font-size: 0.7rem;
-        padding: 3px 8px;
-      }
+        /* 背景动画粒子效果 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
 
-      .version-info a {
-        font-size: 16px !important;
-      }
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
 
-      /* 调整布局结构 */
-      .main-container {
-        flex-direction: column;
-      }
-      
-      .editor-container, 
-      .preview-container {
-        width: 100%;
-        height: 50vh;
-        padding: 10px;
-      }
-      
-      .editor-container {
-        border-right: none;
-        border-bottom: 1px solid #c0c4cc;
-      }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
 
-      /* 调整编辑器和预览区域标题字号 */
-      .editor-header h2,
-      .preview-header h2 {
-        font-size: 1rem;
-      }
+        /* 主标题 */
+        .main-title {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            margin: 0px 0 60px 0;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+            position: relative;
+        }
 
-      /* 调整按钮间距和大小 */
-      .editor-actions {
-        gap: 5px;
-      }
+        .main-title::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 400% 400%;
+            border-radius: 10px;
+            z-index: -1;
+            animation: gradientShift 4s ease infinite;
+            opacity: 0.3;
+            filter: blur(20px);
+        }
 
-      .el-button {
-        padding: 7px 12px;
-      }
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+            to { text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 40px rgba(135, 206, 235, 0.6); }
+        }
 
-      /* 调整编辑器字号 */
-      .CodeMirror {
-        font-size: 12px;
-      }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-      /* 调整预览区域内边距 */
-      .preview-wrapper {
-        padding: 10px;
-      }
+        /* 卡片容器 */
+        .cards-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1200px;
+        }
 
-      /* Element UI 标识适配 */
-      .element-ui-tag {
-        padding: 2px 6px;
-        font-size: 10px;
-      }
-    }
-    
-    /* 添加小屏幕断点 */
-    @media (max-width: 480px) {
-      .header {
-        padding: 10px;
-        height: 56px;
-      }
+        /* 卡片样式 */
+        .card {
+            width: 280px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
 
-      .header h1 {
-        font-size: 1rem;
-      }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
 
-      .version-info {
-        gap: 8px;
-      }
+        .card:hover::before {
+            left: 100%;
+        }
 
-      /* 在特小屏幕上隐藏按钮文字，只显示图标 */
-      .el-button [class^="el-icon-"] {
-        margin-right: 0;
-      }
+        .card:hover {
+            transform: translateY(-10px) scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
 
-      .el-button span:not([class^="el-icon-"]) {
-        display: none;
-      }
-    }
-    
-    /* 添加全屏样式 */
-    .preview-container.fullscreen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 1000;
-      background: white;
-      width: 100%;
-      height: 100%;
-    }
-    
-    .preview-container.fullscreen .preview-wrapper {
-      height: calc(100vh - 80px);
-    }
-    
-    /* Element UI 标识样式加深 */
-    .element-ui-tag {
-      display: inline-flex;
-      align-items: center;
-      margin-right: 10px;
-      padding: 4px 8px;
-      background: #95d475;
-      border: 1px solid #95d475;
-      border-radius: 4px;
-      color: white;
-      font-size: 12px;
-      box-shadow: 0 2px 4px rgba(103, 194, 58, 0.2);
-    }
-    
-    .element-ui-tag i {
-      margin-right: 4px;
-      font-size: 14px;
-    }
-  </style>
+        .card:nth-child(1) {
+            animation: cardSlideIn 0.8s ease-out 0.1s both;
+        }
+
+        .card:nth-child(2) {
+            animation: cardSlideIn 0.8s ease-out 0.3s both;
+        }
+
+        .card:nth-child(3) {
+            animation: cardSlideIn 0.8s ease-out 0.5s both;
+        }
+
+        @keyframes cardSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 卡片图标 */
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .vue2-icon { color: #4fc08d; }
+        .vue3-icon { color: #42b883; }
+        .html-icon { color: #e34c26; }
+
+        /* 卡片标题 */
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+                margin: 20px 0 40px 0;
+            }
+            
+            .cards-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .card {
+                width: 90%;
+                max-width: 300px;
+            }
+        }
+
+        /* 点击波纹效果 */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: rippleEffect 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="app">
-    <!-- 头部 -->
-    <div class="header">
-      <h1><i class="fab fa-vuejs"></i> Vue 2.x SFC Playground</h1>
-      <div class="version-info" style="display: flex; align-items: center; gap: 15px;">
-        <span class="version-badge"><i class="fas fa-code-branch"></i> Vue 2.7.14</span>
-        <a href="v3.html" style="color: #fff; text-decoration: none; font-size: 20px; font-weight: 600;">V3</a>
-      </div>
+    <!-- 背景粒子效果 -->
+    <div class="particles"></div>
+
+    <!-- 主标题 -->
+    <h1 class="main-title">Web Viewer</h1>
+
+    <!-- 卡片容器 -->
+    <div class="cards-container">
+        <div class="card" data-type="vue2">
+            <div class="card-icon vue2-icon">⚡</div>
+            <h3 class="card-title">Vue2 Preview</h3>
+        </div>
+
+        <div class="card" data-type="vue3">
+            <div class="card-icon vue3-icon">🚀</div>
+            <h3 class="card-title">Vue3 Preview</h3>
+        </div>
+
+        <div class="card" data-type="html">
+            <div class="card-icon html-icon">📄</div>
+            <h3 class="card-title">Html Preview</h3>
+        </div>
     </div>
-    
-    <!-- 主体内容 -->
-    <div class="main-container">
-      <!-- 编辑器区域 -->
-      <div class="editor-container">
-        <div class="editor-header">
-          <h2><i class="fas fa-code"></i> 编辑器</h2>
-          <div class="editor-actions">
-            <!-- 添加格式化按钮 -->
-            <el-button size="small" @click="formatCode" icon="el-icon-magic-stick">格式化</el-button>
-            <el-button type="primary" size="small" @click="updatePreview" icon="el-icon-video-play">运行</el-button>
-            <el-button size="small" @click="resetEditor" icon="el-icon-refresh">重置</el-button>
-          </div>
-        </div>
-        <div class="editor-wrapper" ref="editorContainer"></div>
-      </div>
-      
-      <!-- 预览区域 -->
-      <div class="preview-container">
-        <div class="preview-header">
-          <h2><i class="fas fa-play-circle"></i> 预览</h2>
-          <div style="display: flex; align-items: center;">
-            <span class="element-ui-tag">
-              <i class="el-icon-platform-eleme"></i>
-              Element UI
-            </span>
-            <el-button size="small" @click="toggleFullscreen" icon="el-icon-full-screen">
-              {{ isFullscreen ? '退出全屏' : '全屏' }}
-            </el-button>
-          </div>
-        </div>
-        <div class="preview-wrapper">
-          <!-- 使用v-html渲染预览内容 -->
-          <div v-html="previewHtml" id="preview-component"></div>
-          <div v-if="error" class="error-message">
-            <p><strong><i class="fas fa-exclamation-triangle"></i> 错误:</strong> {{ error }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- 引入 Vue 2.7.14 (最新的 Vue 2.x 版本) -->
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
-  
-  <!-- 引入 Element UI -->
-  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-  
-  <script>
-    // 示例组件代码
-    const examples = {
-      // Hello World 示例
-      hello: `<template>
-  <div class="hello-world">
-    <h2>{{ message }}</h2>
-    <p>编辑左侧代码，点击"运行"按钮查看效果</p>
-    <button @click="changeMessage">点击我</button>
-  </div>
-</template>
+    <script>
+        // 创建背景粒子
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            const particleCount = 50;
 
-<script>
-export default {
-  data() {
-    return {
-      message: '你好，Vue!'
-    }
-  },
-  methods: {
-    changeMessage() {
-      this.message = '代码已更新！'
-    }
-  }
-}
-<\/script>
-
-<style scoped>
-.hello-world {
-  text-align: center;
-  padding: 20px;
-  border: 1px solid #ebeef5;
-  border-radius: 4px;
-  background-color: #fff;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  color: #409eff;
-}
-
-button {
-  background-color: #409eff;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-button:hover {
-  background-color: #66b1ff;
-}
-</style>`
-    };
-
-    // 主应用
-    new Vue({
-      el: '#app',
-      data: {
-        editor: null,
-        componentCode: examples.hello, // 默认使用 Hello World 示例
-        error: null,
-        previewVM: null,
-        previewHtml: '', // 用于v-html渲染的HTML字符串
-        tempFilename: 'temp-component.vue',
-        isFullscreen: false  // 添加全屏状态
-      },
-      mounted() {
-        // 初始化编辑器
-        this.initEditor();
-        
-        // 初始化预览
-        this.updatePreview();
-
-        // 添加 ESC 键监听
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && this.isFullscreen) {
-            this.toggleFullscreen();
-          }
-        });
-      },
-      methods: {
-        // 初始化代码编辑器
-        initEditor() {
-          // 配置更强大的编辑器
-          this.editor = CodeMirror(this.$refs.editorContainer, {
-            value: this.componentCode,
-            mode: 'text/x-vue',
-            mode: 'htmlmixed',
-            theme: 'dracula',
-            lineNumbers: true,
-            lineWrapping: true,
-            tabSize: 2,
-            indentUnit: 2,
-            smartIndent: true,
-            indentWithTabs: false,
-            autoCloseBrackets: true,
-            matchBrackets: true,
-            autoCloseTags: true,
-            foldGutter: true,
-            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-            extraKeys: {
-              "Ctrl-Q": function(cm) { cm.foldCode(cm.getCursor()); },
-              "Ctrl-F": "findPersistent",
-              // 添加格式化快捷键
-              "Ctrl-Alt-F": this.formatCode
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
             }
-          });
-        },
-        
-        // 格式化代码
-        formatCode() {
-          try {
-            // 获取当前代码
-            const code = this.editor.getValue();
-            
-            // 使用 Prettier 格式化代码
-            const formattedCode = prettier.format(code, {
-              parser: "vue",
-              plugins: [prettierPlugins.html, prettierPlugins.babel, prettierPlugins.postcss, prettierPlugins.typescript],
-              printWidth: 80,
-              tabWidth: 2,
-              useTabs: false,
-              semi: true,
-              singleQuote: true,
-              trailingComma: "es5",
-              bracketSpacing: true,
-              arrowParens: "avoid",
-              htmlWhitespaceSensitivity: "css"
-            });
-            
-            // 更新编辑器内容
-            this.editor.setValue(formattedCode);
-            
-            // 显示成功消息
-            this.$message({
-              message: '代码格式化成功',
-              type: 'success',
-              duration: 2000
-            });
-          } catch (err) {
-            // 显示错误消息
-            this.$message({
-              message: `格式化失败: ${err.message}`,
-              type: 'error',
-              duration: 3000
-            });
-          }
-        },
-        
-        // 更新预览
-        async updatePreview() {
-          try {
-            this.error = null;
-            const code = this.editor.getValue();
-            
-            // 清理旧实例
-            if (this.previewVM) {
-              this.previewVM.$destroy();
-              document.getElementById('preview-component').innerHTML = '';
-            }
-
-            // 解析组件代码
-            const [template, script, style] = this.parseCode(code);
-            
-            // 添加样式
-            this.addStyle(style);
-            
-            // 创建预览HTML
-            this.generatePreviewHtml(template, script);
-
-          } catch (err) {
-            this.error = err.toString();
-          }
-        },
-        
-        // 生成预览HTML
-        generatePreviewHtml(template, script) {
-          // 创建一个唯一的ID用于挂载组件
-          const mountId = 'vue-component-' + Date.now();
-          
-          // 创建HTML结构
-          this.previewHtml = `<div id="${mountId}"></div>`;
-          
-          // 在下一个事件循环中挂载组件
-          this.$nextTick(() => {
-            try {
-              // 解析脚本获取组件配置
-              const componentOptions = this.evalScript(script);
-              
-              // 添加模板
-              componentOptions.template = template;
-              
-              // 创建新的Vue实例
-              this.previewVM = new Vue(componentOptions).$mount(`#${mountId}`);
-            } catch (err) {
-              this.error = `组件挂载错误: ${err.message}`;
-            }
-          });
-        },
-        
-        // 解析代码结构
-        parseCode(code) {
-          const template = code.match(/<template>([\s\S]*?)<\/template>/i)?.[1] || '';
-          const script = code.match(/<script>([\s\S]*?)<\/script>/ims)?.[1] || '';
-          const style = code.match(/<style[^>]*>([\s\S]*?)<\/style>/i)?.[1] || '';
-          
-          if (!template) throw new Error('缺少template标签');
-          return [template, script, style];
-        },
-
-        // 执行脚本获取配置
-        evalScript(scriptContent) {
-          // 移除import语句和export default
-          scriptContent = scriptContent
-            .replace(/export\s+default/, 'return')
-            .replace(/import\s+.*?from\s+['"].*?['"];?/g, '');
-
-          try {
-            // 执行脚本获取组件配置
-            const fn = new Function(scriptContent);
-            return fn() || {};
-          } catch (e) {
-            throw new Error(`脚本解析错误: ${e.message}`);
-          }
-        },
-
-        // 添加样式到文档
-        addStyle(css) {
-          const styleId = 'dynamic-style';
-          let styleTag = document.getElementById(styleId);
-          if (styleTag) styleTag.remove();
-          
-          styleTag = document.createElement('style');
-          styleTag.id = styleId;
-          styleTag.textContent = css;
-          document.head.appendChild(styleTag);
-        },
-        
-        // 刷新预览
-        refreshPreview() {
-          this.updatePreview();
-        },
-        
-        // 重置编辑器
-        resetEditor() {
-          this.editor.setValue(examples.hello);
-          this.updatePreview();
-        },
-        
-        // 切换全屏方法
-        toggleFullscreen() {
-          this.isFullscreen = !this.isFullscreen;
-          const previewContainer = document.querySelector('.preview-container');
-          
-          if (this.isFullscreen) {
-            previewContainer.classList.add('fullscreen');
-          } else {
-            previewContainer.classList.remove('fullscreen');
-          }
         }
-      },
-      beforeDestroy() {
-        document.removeEventListener('keydown', this.handleEscKey);
-      }
-    });
-  </script>
+
+        // 添加点击波纹效果
+        function createRipple(e) {
+            const card = e.currentTarget;
+            const ripple = document.createElement('div');
+            const rect = card.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.className = 'ripple';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+
+            card.appendChild(ripple);
+
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        }
+
+        // 卡片点击事件
+        function handleCardClick(e) {
+            createRipple(e);
+            const cardType = e.currentTarget.dataset.type;
+            
+            // 添加点击反馈动画
+            e.currentTarget.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                e.currentTarget.style.transform = '';
+            }, 150);
+
+            window.open(cardType + '.html', '_blank');
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            
+            // 为所有卡片添加点击事件
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('click', handleCardClick);
+            });
+        });
+
+        // 鼠标移动视差效果
+        document.addEventListener('mousemove', function(e) {
+            const cards = document.querySelectorAll('.card');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            cards.forEach((card, index) => {
+                const speed = (index + 1) * 0.5;
+                const xOffset = (x - 0.5) * speed;
+                const yOffset = (y - 0.5) * speed;
+                
+                card.style.transform += ` translate(${xOffset}px, ${yOffset}px)`;
+            });
+        });
+    </script>
 </body>
 </html>
-
