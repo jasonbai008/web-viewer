@@ -1,4 +1,4 @@
-# vue-preview
+# Web Viewer
 
 一个强大的 Web 预览工具，支持预览 Vue2 和 Vue3 单文件组件、Html。
 
